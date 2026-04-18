@@ -1,57 +1,48 @@
-# 📋 Веб-приложение "Список сотрудников" на Delphi
+# Веб-приложение "Сотрудники" на Delphi + PostgreSQL
 
 [![Delphi](https://img.shields.io/badge/Delphi-10.2-red.svg)](https://www.embarcadero.com/products/delphi)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-blue.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows-blue.svg)]()
 
-## 📌 О проекте
+## О проекте
 
-Веб-приложение для отображения списка сотрудников компании, разработанное на **Embarcadero Delphi 10.2** с использованием технологии **WebBroker**.
+Учебное веб-приложение, демонстрирующее архитектуру **клиент-сервер**:
 
-Приложение реализует архитектуру клиент-сервер:  
-- Веб-браузер отправляет HTTP-запросы  
-- Сервер на Delphi обрабатывает запросы и динамически генерирует HTML-страницу  
-- Данные могут быть получены из базы данных PostgreSQL (структура подготовлена)
+- **Серверная часть** — Delphi 10.2 + WebBroker + Indy
+- **Хранение данных** — PostgreSQL 18
+- **Клиентская часть** — любой браузер (HTML-таблица)
 
-## 🚀 Быстрый старт
+>  **Важно:** на данный момент реализована только генерация статической HTML-страницы. Подключение к PostgreSQL выполняется в коде, но данные пока захардкожены для демонстрации.
 
-### Требования
+## Быстрый старт
 
-- Windows 7/8/10/11  
-- Embarcadero Delphi 10.2 (или выше)  
-- PostgreSQL 18 (опционально, для дальнейшего расширения)
+### 1. Требования
 
-### Запуск приложения
+- Windows 10/11
+- Embarcadero Delphi 10.2+ (с установленными компонентами FireDAC)
+- PostgreSQL 18 (или 15+)
+- Права администратора для открытия порта 8080
 
-bash
-# 1. Клонировать репозиторий
+### 2. Установка и запуск
+
+```bash
+# Клонирование
 git clone https://github.com/ВАШ_АККАУНТ/WebApp-Delphi-Employees.git
+cd WebApp-Delphi-Employees
 
-# 2. Открыть проект в Delphi
-File → Open → WebApp.dproj
+# Открыть в Delphi
+start WebApp.dprojctive BOOLEAN DEFAULT TRUE
+);
+```
+### 3. Настройка базы данных (PostgreSQL)
+Запустите в pgAdmin или psql:
 
-# 3. Скомпилировать и запустить
-F9 (Run)
+```  Создание базы
+CREATE DATABASE company;
 
-# 4. Открыть в браузере
+-- Подключитесь к базе \c company
 
-
-### Структура проекта
-
-WebApp-Delphi-Employees/
-├── WebModuleUnit1.pas      # Главный модуль (обработка запросов)
-├── WebModuleUnit1.dfm      # Файл формы веб-модуля
-├── Project1.dpr            # Файл проекта
-├── Project1.dproj          # Настройки проекта
-├── database/
-│   └── employees.sql       # SQL скрипт для создания БД
-├── README.md               # Документация
-└── REPORT.md               # Отчет о работе
-http://localhost:8080
-
-
-### База данных (подготовленная структура)
-Схема таблицы employees
+-- Создание таблицы
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -63,7 +54,41 @@ CREATE TABLE employees (
     is_active BOOLEAN DEFAULT TRUE
 );
 
+-- Тестовые данные
+INSERT INTO employees (name, department, position, salary, hire_date, email) VALUES
+('Иванов Иван', 'IT', 'Разработчик', 85000, '2023-01-15', 'ivanov@company.com'),
+('Петров Петр', 'Sales', 'Менеджер', 65000, '2023-02-20', 'petrov@company.com'),
+('Сидорова Анна', 'HR', 'HR-специалист', 60000, '2023-03-10', 'sidorova@company.com');
 
+-- Создание пользователя для приложения
+CREATE USER webapp_user WITH PASSWORD '123456';
+GRANT SELECT ON employees TO webapp_user;
+```
+
+### 4. Настройка подключения в Delphi
+В модуле WebModuleUnit1.pas укажите параметры подключения:
+
+```
+const
+  DB_HOST = 'localhost';
+  DB_PORT = 5432;
+  DB_NAME = 'company';
+  DB_USER = 'webapp_user';
+  DB_PASS = '123456';
+```
+## Структура проекта
+```
+├── WebModuleUnit1.pas       # Обработчик HTTP-запросов (главный код)
+├── WebModuleUnit1.dfm       # Визуальное представление веб-модуля
+├── Project1.dpr             # Точка входа
+├── database/
+│   └── employees.sql        # SQL-скрипт для создания БД
+├── README.md
+└── SCREENSHOT.png           # Скриншот работающего приложения
+```
+
+### Скриншот
+![Скриншот работающего приложения](screenshot.png)
 
 
 
